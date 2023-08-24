@@ -1,8 +1,8 @@
-import productsManagerDB from "../dao/mongo/products.manager.js";
+import ProductsManagerDB from "../dao/mongo/products.manager.js";
 import CartManagerDB from '../dao/mongo/carts.manager.js';
 import productsModel from "../dao/models/products.schema.js";
 
-const productManager = new productsManagerDB();
+const productManager = new ProductsManagerDB();
 
 export const getProducts = async (req, res) => {
     const { page, query, limit, order } = req.query;

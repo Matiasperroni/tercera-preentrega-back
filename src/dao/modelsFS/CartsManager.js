@@ -5,7 +5,7 @@ import path from "path";
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = path.dirname(currentFilePath);
 const cartsFilePath = path.join(currentDirPath, "../data/carts/carts.js");
-export default class CartManager {
+export default class CartManagerFS {
     constructor(products) {
         this.products = products;
         this.id = 1;
@@ -22,7 +22,7 @@ export default class CartManager {
     };
     addNewCart = async (products) => {
         const carts = await this.getCarts();
-        const cart = new CartManager(products);
+        const cart = new CartManagerFS(products);
         const checkID = carts[carts.length - 1];
         if (!checkID) {
             cart.id = 1;

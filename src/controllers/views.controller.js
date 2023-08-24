@@ -1,5 +1,5 @@
-import messagesManagerDB from '../dao/mongo/messages.manager.js';
-const messageManager = new messagesManagerDB()
+import MessagesManagerDB from '../dao/mongo/messages.manager.js';
+const messageManager = new MessagesManagerDB()
 
 export const addMessage = async(req, res) => {
     let user = req.params.user;

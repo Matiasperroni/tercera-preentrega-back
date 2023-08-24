@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {getCarts, createNewCart, getCartByID, addProductToCart, deleteProdFromCart, updateWholeCart, updateQuantity, deleteCart} from "../controllers/carts.controller.js"
+import { isUserAvailableToAddToCart } from '../middlewares/middlewares.js';
 const router = Router();
 
 
@@ -11,7 +12,7 @@ router.post("/", createNewCart);
 
 router.get("/:cid", getCartByID);
 
-router.post("/:cid/product/:pid", addProductToCart);
+router.post("/:cid/product/:pid", isUserAvailableToAddToCart, addProductToCart);
 
 router.delete("/:cid/products/:pid", deleteProdFromCart);
 

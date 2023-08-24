@@ -1,6 +1,6 @@
 import messagesModel from "../models/messages.schema.js";
 
-class messagesManagerDB {
+class MessagesManagerDB {
     constructor() {
         this.messagesModel = messagesModel;
     }
@@ -24,4 +24,4 @@ class messagesManagerDB {
         }
     }
 }
-export default messagesManagerDB;
+export default MessagesManagerDB;

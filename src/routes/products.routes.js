@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import {getProducts, getProductById, addProduct, updateProduct, deleteProduct} from "../controllers/products.controller.js"
-
+import { isAdmin } from '../middlewares/middlewares.js';
 const router = Router();
 
 
@@ -11,10 +11,10 @@ router.get("/", getProducts);
 
 router.get("/:pid", getProductById);
 
-router.post("/", addProduct);
+router.post("/", isAdmin, addProduct);
 
-router.put("/:pid", updateProduct);
+router.put("/:pid", isAdmin, updateProduct);
 
-router.delete("/:pid", deleteProduct);
+router.delete("/:pid", isAdmin, deleteProduct);
 
 export default router;

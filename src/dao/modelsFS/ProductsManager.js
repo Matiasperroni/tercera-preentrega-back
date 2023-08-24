@@ -10,7 +10,7 @@ const productsFilePath = path.join(
     "../data/products/products.js"
 );
 
-export default class ProductManager {
+export default class ProductManagerFS {
     constructor(
         title,
         description,
@@ -54,7 +54,7 @@ export default class ProductManager {
         status
     ) => {
         const products = await this.getProducts();
-        const product = new ProductManager(
+        const product = new ProductManagerFS(
             title,
             description,
             price,
@@ -156,7 +156,7 @@ export default class ProductManager {
     };
 }
 
-const producto = new ProductManager();
+const producto = new ProductManagerFS();
 // const obj = {
 //     title: "bici",
 //     description: "soy una bici",

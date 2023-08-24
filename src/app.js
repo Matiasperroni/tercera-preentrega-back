@@ -3,17 +3,17 @@ import productsRouter from "./routes/products.routes.js";
 import cartsRouter from "./routes/carts.routes.js";
 import viewsRouter from "./routes/views.routes.js";
 import sessionsRouter from "./routes/sessions.routes.js";
+import chatRouter from "./routes/chat.routes.js"
 import { Server } from "socket.io";
 import __dirname from "./utils.js";
 import handlebars from "express-handlebars";
-import productsManagerDB from "./dao/mongo/products.manager.js";
-import messagesManagerDB from "./dao/mongo/messages.manager.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
+import { ioConnection } from './controllers/chat.controller.js';
 // import cookieParser from 'cookie-parser';
 // Mongodb URL : "mongodb+srv://Matias-Perroni:fcKP3TXvcILtCNWu@cluster0.ymwavy3.mongodb.net/ecommerce?retryWrites=true&w=majority"
 
@@ -66,36 +66,18 @@ const serverHttp = app.listen(8080, () => {
     console.log("Listening to port 8080");
 });
 
-const productManager = new productsManagerDB();
-const messageManager = new messagesManagerDB();
-
-app.get("/realtimeproducts", async (req, res) => {
-    res.render("realTimeProducts");
-});
-//websocket
+//websocket server
 const io = new Server(serverHttp);
-//function to get products
-const sendProductList = async () => {
-    const products = await productManager.getProducts();
-    return products;
-};
 
 //routes
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
 app.use("/sessions", sessionsRouter);
+app.use("/", chatRouter)
 
-io.on("connection", async (socket) => {
-    console.log("Nuevo cliente conectado");
-    const products = await sendProductList();
-    socket.emit("sendProducts", products);
-
-    socket.on("message", async (data) => {
-        let user = data.user;
-        let message = data.message;
-        await messageManager.addMessage(user, message);
-        const messages = await messageManager.getMessages();
-        io.emit("messageLogs", messages);
-    });
-});
+io.on("connection", ioConnection);
+//todo que el usuario que manda el msj al chat salga del usuario que esta logueado
+//asignar carrito al crear usuario
+//popular el carrito
+//ticket al usuario
