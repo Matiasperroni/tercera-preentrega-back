@@ -100,11 +100,11 @@ export const finishPurchase = async (req, res) => {
         const user = req?.session?.user;
         const cartID = req.params.cid;
         const cart = await cartRepository.purchase(cartID, user.email);
-        console.log("el cart", cart);
-        cart.newTicket.purchaser = `Name: ${user.first_name} Last Name: ${user.last_name}. Email: ${user.email}`;
+        cart.ticket.purchaser = `Name: ${user.first_name} Last Name: ${user.last_name}. Email: ${user.email}`;
         if(cart) {
-            const newTicket = cart.newTicket;
-            res.render("purchase", {newTicket});
+            const newTicket = {newTicket: cart.ticket};
+            console.log(newTicket);
+            res.render("purchase", {newTicket: newTicket});
         } else {
             res.status(500).send("error: error trying to purchase.")
         }

@@ -178,11 +178,13 @@ class CartManagerDB {
                 amount: totalPrice,
                 purchaser: email,
             });
+            const ticket = await ticketModel.findOne({code: newTicket.code}).lean()
+            console.log("soy el ticket", ticket);
 
             await cart.save();
 
             return {
-                newTicket,
+                ticket,
                 unavailableProducts,
             };
         } catch (error) {
