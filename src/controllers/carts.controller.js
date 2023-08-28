@@ -1,16 +1,17 @@
-import CartManagerDB from "../dao/mongo/carts.manager.js";
-const cartManager = new CartManagerDB();
+// import CartManagerDB from "../dao/mongo/carts.manager.js";
+// const cartManager = new CartManagerDB();
+// import ProductDTO from '../dto/products.dto.js';
+import { cartRepository } from '../repositories/index.js';
 
 export const getCarts = async (req, res) => {
-    const carts = await cartManager.getCarts();
+    const carts = await cartRepository.getAllCarts();
     res.send(carts);
 }
 
 export const createNewCart = async (req, res) => {
     try {
-        const products = req.body;
-        const cartAdded = await cartManager.createNewCart(products);
-        res.send(cartAdded);
+        const cart = await cartRepository.createNewCart();
+        res.send(cart);
     } catch (error) {
         console.error(error);
         res.status(500).send("Error al obtener los datos");
@@ -20,7 +21,7 @@ export const createNewCart = async (req, res) => {
 export const getCartByID = async (req, res) => {
     try {
         const cartID = req.params.cid;
-        const cart = await cartManager.getCartByID(cartID);
+        const cart = await cartRepository.getById(cartID);
         const products = cart.products;
         // res.send({products});
         res.render("cart", { products });
@@ -35,7 +36,7 @@ export const addProductToCart = async (req, res) => {
     try {
         const cartID = req.params.cid;
         const prodID = req.params.pid;
-        const cart = await cartManager.getCartByID(cartID);
+        const cart = await cartRepository.getById(cartID);
         console.log(cart);
         if (cart) {
             const existingProd = cart.products.find(
@@ -43,11 +44,11 @@ export const addProductToCart = async (req, res) => {
             );
             if (existingProd) {
                 const quantity = existingProd.quantity + 1;
-                await cartManager.updateQuantity(cartID, prodID, quantity);
+                await cartRepository.updateQuantity(cartID, prodID, quantity);
                 return;
             }
         }
-        const productAddedToCart = await cartManager.addToCart(cartID, prodID);
+        const productAddedToCart = await cartRepository.addToCart(cartID, prodID);
         res.send(productAddedToCart);
     } catch (error) {
         console.error(error);
@@ -58,7 +59,7 @@ export const addProductToCart = async (req, res) => {
 export const deleteProdFromCart = async (req, res) => {
     const cartID = req.params.cid;
     const prodID = req.params.pid;
-    const deleted = await cartManager.deleteProdFromCart(cartID, prodID);
+    const deleted = await cartRepository.deleteProduct(cartID, prodID);
     res.send(deleted);
 };
 
@@ -66,7 +67,7 @@ export const updateWholeCart = async (req, res) => {
     const cartID = req.params.cid;
     const prod = req.body;
     // console.log(cartID, prod);
-    const updatedCart = await cartManager.updateWholeCart(cartID, prod);
+    const updatedCart = await cartRepository.updateWholeCart(cartID, prod);
     // console.log("a ver", updatedCart);
     res.send(updatedCart);
 };
@@ -75,7 +76,7 @@ export const updateQuantity = async (req, res) => {
     const cid = req.params.cid;
     const pid = req.params.pid;
     const quantity = req.body.quantity;
-    const updatedQuantity = await cartManager.updateQuantity(
+    const updatedQuantity = await cartRepository.updateQuantity(
         cid,
         pid,
         quantity
@@ -85,7 +86,7 @@ export const updateQuantity = async (req, res) => {
 
 export const deleteCart = async (req, res) => {
     const cid = req.params.cid;
-    const deletedCart = await cartManager.emptyCart(cid);
+    const deletedCart = await cartRepository.emptyCart(cid);
     console.log(deletedCart);
     res.send(deletedCart);
 };

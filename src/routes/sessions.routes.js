@@ -2,6 +2,7 @@ import { Router } from "express";
 import passport from "passport";
 import { registerSession, failedRegister, loginSession, failedLogin, logout, githubCallback } from '../controllers/sessions.controller.js';
 
+
 const router = Router();
 
 

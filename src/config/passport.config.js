@@ -1,8 +1,10 @@
 import passport from "passport";
 import local from "passport-local";
 import userModel from "../dao/models/users.schema.js";
+import CartManagerDB from '../dao/mongo/carts.manager.js';
 import { createHash, validatePassword } from "../utils.js";
 import GitHubStrategy from "passport-github2";
+const cartManager = new CartManagerDB();
 // let url = "http://http://localhost:8080/sessions/githubcallback"
 
 const LocalStrategy = local.Strategy;
@@ -15,6 +17,8 @@ const initializePassport = () => {
                 passReqToCallback: true,
             },
             async (req, username, password, done) => {
+                const cart = await cartManager.createNewCart()
+                // console.log("soy cart", cart);
                 const { first_name, last_name, email, age } = req.body;
                 try {
                     let user = await userModel.findOne({ email: username });
@@ -25,7 +29,9 @@ const initializePassport = () => {
                         email,
                         age,
                         password: createHash(password),
+                        cart
                     };
+                    console.log("soy new user",newUser);
                     user = await userModel.create(newUser);
                     return done(null, user);
                 } catch (error) {

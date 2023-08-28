@@ -1,13 +1,7 @@
-import ProductsManagerDB from "../dao/mongo/products.manager.js";
-import MessagesManagerDB from "../dao/mongo/messages.manager.js";
-
-
-
-const productManager = new ProductsManagerDB();
-const messageManager = new MessagesManagerDB();
+import { messageRepository, productRepository } from '../repositories/index.js';
 
 const sendProductList = async () => {
-    const products = await productManager.getProducts();
+    const products = await productRepository.getProducts();
     return products;
 };
 
@@ -20,8 +14,8 @@ export const ioConnection = async (socket) => {
         console.log("from data", data);
         let user = data.user;
         let message = data.message;
-        await messageManager.addMessage(user, message);
-        const messages = await messageManager.getMessages();
+        await messageRepository.addMessage(user, message);
+        const messages = await messageRepository.getMessages();
         socket.emit("messageLogs", messages);
     });
 };
