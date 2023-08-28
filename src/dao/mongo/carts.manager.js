@@ -1,4 +1,6 @@
 import cartModel from "../models/carts.schema.js";
+import productsModel from '../models/products.schema.js';
+import ticketModel from '../models/tickets.schema.js'
 
 class CartManagerDB {
     constructor() {
@@ -11,7 +13,7 @@ class CartManagerDB {
             return carts;
         } catch (error) {
             // throw new Error("Doesn´t exists a cart with this ID.");
-            console.error("Doesn´t exists a cart with this ID.")
+            console.error("Doesn´t exists a cart with this ID.");
         }
     }
     async createNewCart() {
@@ -123,14 +125,68 @@ class CartManagerDB {
         try {
             const cart = await this.cartsModel.findById(cartID);
             // console.log("soy cart", cart.products);
-            const prodToUpdate = cart.products.find((prod) => prod.product._id.toString() === prodID);
+            const prodToUpdate = cart.products.find(
+                (prod) => prod.product._id.toString() === prodID
+            );
             // console.log("soy prodToUpdate", prodToUpdate);
             prodToUpdate.quantity = quantity;
             // console.log("soy prodToUpdate despues", prodToUpdate);
             cart.save();
             return cart;
         } catch (err) {
-            console.error(err)
+            console.error(err);
+        }
+    }
+    async purchase(cartID, email) {
+        try {
+            const cart = await this.cartsModel.findById(cartID);
+            if (!cart) {
+                throw new Error("Cart not found");
+            }
+
+            let totalPrice = 0;
+            let unavailableProducts = [];
+            const randomCode = Math.floor(Math.random() * 1000) + 1;
+
+            for (const cartProduct of cart.products) {
+                const product = await productsModel.findById(
+                    cartProduct.product
+                );
+
+                if (!product) {
+                    throw new Error("Product not found");
+                }
+
+                if (product.stock < cartProduct.quantity) {
+                    unavailableProducts.push(cartProduct.product);
+                } else {
+                    product.stock -= cartProduct.quantity;
+                    await this.deleteProdFromCart(cartID, cartProduct.product._id);
+                    totalPrice =
+                        product.price * cartProduct.quantity + totalPrice;
+                    await product.save();
+                }
+            }
+
+            if (unavailableProducts.length > 0) {
+                return unavailableProducts;
+            }
+
+            const newTicket = await ticketModel.create({
+                code: randomCode,
+                purchase_datetime: Date.now(),
+                amount: totalPrice,
+                purchaser: email,
+            });
+
+            await cart.save();
+
+            return {
+                newTicket,
+                unavailableProducts,
+            };
+        } catch (error) {
+            throw new Error("Could not complete purchase: " + error);
         }
     }
 }

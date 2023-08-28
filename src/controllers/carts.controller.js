@@ -1,12 +1,12 @@
 // import CartManagerDB from "../dao/mongo/carts.manager.js";
 // const cartManager = new CartManagerDB();
 // import ProductDTO from '../dto/products.dto.js';
-import { cartRepository } from '../repositories/index.js';
+import { cartRepository } from "../repositories/index.js";
 
 export const getCarts = async (req, res) => {
     const carts = await cartRepository.getAllCarts();
     res.send(carts);
-}
+};
 
 export const createNewCart = async (req, res) => {
     try {
@@ -48,7 +48,10 @@ export const addProductToCart = async (req, res) => {
                 return;
             }
         }
-        const productAddedToCart = await cartRepository.addToCart(cartID, prodID);
+        const productAddedToCart = await cartRepository.addToCart(
+            cartID,
+            prodID
+        );
         res.send(productAddedToCart);
     } catch (error) {
         console.error(error);
@@ -89,4 +92,27 @@ export const deleteCart = async (req, res) => {
     const deletedCart = await cartRepository.emptyCart(cid);
     console.log(deletedCart);
     res.send(deletedCart);
+};
+
+export const finishPurchase = async (req, res) => {
+    try {
+        console.log("reqsessionuser", req?.session?.user);
+        const user = req?.session?.user;
+        const cartID = req.params.cid;
+        const cart = await cartRepository.purchase(cartID, user.email);
+        console.log("el cart", cart);
+        cart.newTicket.purchaser = `Name: ${user.first_name} Last Name: ${user.last_name}. Email: ${user.email}`;
+        if(cart) {
+            const newTicket = cart.newTicket;
+            res.render("purchase", {newTicket});
+        } else {
+            res.status(500).send("error: error trying to purchase.")
+        }
+
+
+        
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error purchasing.");
+    }
 };

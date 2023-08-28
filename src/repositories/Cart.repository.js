@@ -55,4 +55,9 @@ export default class CartRepository {
         const productDelete = await this.dao.deleteProdFromCart(cartID, prodID);
         return productDelete;
     };
+
+    purchase = async (cartID, email) => {
+        const purchase = await this.dao.purchase(cartID, email)
+        return purchase;
+    }
 }

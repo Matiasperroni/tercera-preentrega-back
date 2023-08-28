@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {getCarts, createNewCart, getCartByID, addProductToCart, deleteProdFromCart, updateWholeCart, updateQuantity, deleteCart} from "../controllers/carts.controller.js"
+import {getCarts, createNewCart, getCartByID, addProductToCart, deleteProdFromCart, updateWholeCart, updateQuantity, deleteCart, finishPurchase} from "../controllers/carts.controller.js"
 import { isUserAvailableToAddToCart } from '../middlewares/middlewares.js';
 const router = Router();
 
@@ -21,5 +21,7 @@ router.put("/:cid", updateWholeCart);
 router.put("/:cid/products/:pid", updateQuantity);
 
 router.delete("/:cid", deleteCart);
+
+router.get("/:cid/purchase", isUserAvailableToAddToCart, finishPurchase)
 
 export default router;
